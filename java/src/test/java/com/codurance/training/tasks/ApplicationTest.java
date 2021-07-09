@@ -80,6 +80,8 @@ public final class ApplicationTest {
         execute("check 5");
         execute("check 6");
 
+        execute("deadline 7 2020-06-27");
+
         execute("show");
         readLines(
                 "secrets",
@@ -91,10 +93,28 @@ public final class ApplicationTest {
                 "    [ ] 4: SOLID",
                 "    [x] 5: Coupling and Cohesion",
                 "    [x] 6: Primitive Obsession",
-                "    [ ] 7: Outside-In TDD",
+                "    [ ] 7: Outside-In TDD; 2020-06-27",
                 "    [ ] 8: Interaction-Driven Design",
                 ""
         );
+
+        execute("quit");
+    }
+
+//    @Test(timeout = 1000)
+    public void delete_task() throws IOException {
+        execute("add project secrets");
+        execute("add task secrets Eat more donuts.");
+
+        execute("show");
+        readLines(
+                "secrets",
+                "    [ ] 1: Eat more donuts."
+        );
+        execute("delete 1");
+
+        execute("show");
+        readLines("");
 
         execute("quit");
     }

@@ -12,11 +12,11 @@ import java.util.Map;
 public final class TaskList implements Runnable {
     private static final String QUIT = "quit";
 
-    private final Map<String, List<Task>> tasks = new LinkedHashMap<>();
+    private final TaskMap tasks = new TaskMap();
     private final BufferedReader in;
     private final PrintWriter out;
 
-    private long lastId = 0;
+    private TaskId lastId = new TaskId(0);
 
     public static void main(String[] args) throws Exception {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -30,101 +30,132 @@ public final class TaskList implements Runnable {
     }
 
     public void run() {
-        while (true) {
+        boolean shouldContinue = true;
+        while (shouldContinue) {
             out.print("> ");
             out.flush();
-            String command;
+            CommandLine commandLine;
             try {
-                command = in.readLine();
+                commandLine = new CommandLine(in.readLine());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            if (command.equals(QUIT)) {
-                break;
-            }
-            execute(command);
+            shouldContinue = execute(commandLine.getCommand());
         }
     }
 
-    private void execute(String commandLine) {
-        String[] commandRest = commandLine.split(" ", 2);
-        String command = commandRest[0];
-        switch (command) {
-            case "show":
+    private boolean execute(Command command) {
+        boolean shouldContinue = true;
+        switch (command.getCommandAction()) {
+            case SHOW:
                 show();
                 break;
-            case "add":
-                add(commandRest[1]);
+            case ADD:
+                add(command);
                 break;
-            case "check":
-                check(commandRest[1]);
+            case CHECK:
+                check(command);
                 break;
-            case "uncheck":
-                uncheck(commandRest[1]);
+            case UNCHECK:
+                uncheck(command);
                 break;
-            case "help":
+            case HELP:
                 help();
                 break;
+            case QUIT:
+                shouldContinue = quit();
+                break;
+            case DEADLINE:
+                deadline(command);
+                break;
             default:
-                error(command);
+                //error(command.getCaseCommand());
                 break;
         }
+        return shouldContinue;
+    }
+
+    private boolean quit() {
+        return false;
     }
 
     private void show() {
-        for (Map.Entry<String, List<Task>> project : tasks.entrySet()) {
+        for (Map.Entry<ProjectName, List<Task>> project : tasks.entrySet()) {
             out.println(project.getKey());
             for (Task task : project.getValue()) {
-                out.printf("    [%c] %d: %s%n", (task.isDone() ? 'x' : ' '), task.getId(), task.getDescription());
+                out.println(task.getDisplayMessage());
+//                out.printf("    [%c] %s: %s%n", (task.isDone() ? 'x' : ' '), task.getId().toString(), task.getDescription().toString());
             }
             out.println();
         }
     }
 
-    private void add(String commandLine) {
-        String[] subcommandRest = commandLine.split(" ", 2);
-        String subcommand = subcommandRest[0];
-        if (subcommand.equals("project")) {
-            addProject(subcommandRest[1]);
-        } else if (subcommand.equals("task")) {
-            String[] projectTask = subcommandRest[1].split(" ", 2);
-            addTask(projectTask[0], projectTask[1]);
+    private void add(Command command) {
+        /*
+        * [CMD]  [nodetype]  [projectname]
+        * add      project     training
+        * [CMD]  [nodetype]           [taskdescription]
+        * add        task    training Four Elements of Simple Design
+        * */
+        if (command.getNodeType() == NodeType.PROJECT) {
+            addProject(command.getProjectName());
+        } else if (command.getNodeType() == NodeType.TASK) {
+            addTask(command.getProjectName(), command.getTaskDescription(), command.getDeadLine());
         }
     }
 
-    private void addProject(String name) {
-        tasks.put(name, new ArrayList<Task>());
+    private void addProject(ProjectName projectName) {
+        tasks.put(projectName, new ArrayList<Task>());
     }
 
-    private void addTask(String project, String description) {
-        List<Task> projectTasks = tasks.get(project);
+    private void addTask(ProjectName projectName, TaskDescription taskDescription, DeadLine deadLine) {
+        List<Task> projectTasks = tasks.get(projectName.toString());
         if (projectTasks == null) {
-            out.printf("Could not find a project with the name \"%s\".", project);
+            out.printf("Could not find a project with the name \"%s\".", projectName);
             out.println();
             return;
         }
-        projectTasks.add(new Task(nextId(), description, false));
+        if(deadLine == null)
+            projectTasks.add(new Task(lastId.nextId(), taskDescription, false));
+        else
+            projectTasks.add(new Task(lastId.nextId(), taskDescription, false, deadLine));
     }
 
-    private void check(String idString) {
-        setDone(idString, true);
+    private void check(Command command) {
+        setDone(command.getTaskId(), true);
     }
 
-    private void uncheck(String idString) {
-        setDone(idString, false);
+    private void uncheck(Command command) {
+        setDone(command.getTaskId(), false);
     }
 
-    private void setDone(String idString, boolean done) {
-        int id = Integer.parseInt(idString);
-        for (Map.Entry<String, List<Task>> project : tasks.entrySet()) {
+    private void deadline(Command command) {
+        setDeadline(command.getTaskId(), command.getDeadLine());
+    }
+
+    private void setDeadline(TaskId taskId, DeadLine deadLine) {
+        for (Map.Entry<ProjectName, List<Task>> project : tasks.entrySet()) {
             for (Task task : project.getValue()) {
-                if (task.getId() == id) {
+                if (task.getId().equals(taskId)) {
+                    task.setDeadLine(deadLine);
+                    return;
+                }
+            }
+        }
+        out.printf("Could not find a task with an ID of %d.", taskId.toInteger());
+        out.println();
+    }
+
+    private void setDone(TaskId taskid, boolean done) {
+        for (Map.Entry<ProjectName, List<Task>> project : tasks.entrySet()) {
+            for (Task task : project.getValue()) {
+                if (task.getId().equals(taskid)) {
                     task.setDone(done);
                     return;
                 }
             }
         }
-        out.printf("Could not find a task with an ID of %d.", id);
+        out.printf("Could not find a task with an ID of %d.", taskid.toInteger());
         out.println();
     }
 
@@ -132,7 +163,8 @@ public final class TaskList implements Runnable {
         out.println("Commands:");
         out.println("  show");
         out.println("  add project <project name>");
-        out.println("  add task <project name> <task description>");
+        out.println("  add task <project name> <task description> [task deadline]");
+        out.println("  deadline <task ID>* <task deadline>");
         out.println("  check <task ID>");
         out.println("  uncheck <task ID>");
         out.println();
@@ -143,7 +175,7 @@ public final class TaskList implements Runnable {
         out.println();
     }
 
-    private long nextId() {
-        return ++lastId;
-    }
+//    private TaskId nextId() {
+//        return ++lastId;
+//    }
 }
