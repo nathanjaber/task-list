@@ -1,5 +1,7 @@
 package com.codurance.training.tasks;
 
+import java.util.Objects;
+
 public class ProjectName {
     private String value;
 
@@ -16,5 +18,10 @@ public class ProjectName {
     public boolean equals(Object obj) {
         ProjectName anotherProject = (ProjectName)obj;
         return this.value.equals(anotherProject.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

@@ -69,7 +69,6 @@ public final class TaskList implements Runnable {
                 deadline(command);
                 break;
             default:
-                //error(command.getCaseCommand());
                 break;
         }
         return shouldContinue;
@@ -84,19 +83,12 @@ public final class TaskList implements Runnable {
             out.println(project.getKey());
             for (Task task : project.getValue()) {
                 out.println(task.getDisplayMessage());
-//                out.printf("    [%c] %s: %s%n", (task.isDone() ? 'x' : ' '), task.getId().toString(), task.getDescription().toString());
             }
             out.println();
         }
     }
 
     private void add(Command command) {
-        /*
-        * [CMD]  [nodetype]  [projectname]
-        * add      project     training
-        * [CMD]  [nodetype]           [taskdescription]
-        * add        task    training Four Elements of Simple Design
-        * */
         if (command.getNodeType() == NodeType.PROJECT) {
             addProject(command.getProjectName());
         } else if (command.getNodeType() == NodeType.TASK) {
@@ -109,7 +101,7 @@ public final class TaskList implements Runnable {
     }
 
     private void addTask(ProjectName projectName, TaskDescription taskDescription, DeadLine deadLine) {
-        List<Task> projectTasks = tasks.get(projectName.toString());
+        List<Task> projectTasks = tasks.get(projectName);
         if (projectTasks == null) {
             out.printf("Could not find a project with the name \"%s\".", projectName);
             out.println();
@@ -174,8 +166,4 @@ public final class TaskList implements Runnable {
         out.printf("I don't know what the command \"%s\" is.", command);
         out.println();
     }
-
-//    private TaskId nextId() {
-//        return ++lastId;
-//    }
 }
