@@ -1,23 +1,23 @@
 package com.codurance.training.tasks;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ShowCommand extends Command {
-    public ShowCommand () {
+    private Console console;
+
+    public ShowCommand(Console console) {
         super(CommandAction.SHOW);
+        this.console = console;
     }
 
-    public List<String> execute(TaskList tasks) {
-        List<String> lines = new ArrayList<>();
+    public void execute(TaskList tasks) {
 
         for (Map.Entry<ProjectName, List<Task>> project : tasks.entrySet()) {
-            lines.add(project.getKey().toString());
+            console.print(project.getKey());
             for (Task task : project.getValue()) {
-                lines.add(task.getDisplayMessage().toString());
+                console.print(task.getDisplayMessage());
             }
         }
-        return lines;
     }
 }

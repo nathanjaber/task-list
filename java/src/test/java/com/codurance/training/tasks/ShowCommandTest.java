@@ -8,10 +8,7 @@ import org.mockito.MockitoAnnotations;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class ShowCommandTest {
@@ -20,6 +17,7 @@ class ShowCommandTest {
     private TaskList tasks;
     private PrintWriter out;
     private PrintStream ps;
+    private Console fakeConsole;
 
     @BeforeEach
     void setUp() {
@@ -28,6 +26,7 @@ class ShowCommandTest {
 
         tasks = mock(TaskList.class);
         out = mock(PrintWriter.class);
+        fakeConsole = mock(Console.class);
 
         Task task = mock(Task.class);
         ps = mock(PrintStream.class);
@@ -38,17 +37,15 @@ class ShowCommandTest {
         String projectName = "Test fixture";
         String taskText = "Run tasks";
 
-        ShowCommand showCommand =  new ShowCommand();
+        ShowCommand showCommand = new ShowCommand(fakeConsole);
         TaskList tasks = new TaskList();
         Task task = new Task(new TaskId(1), new TaskDescription(taskText), false);
         tasks.addTask(new ProjectName(projectName), task);
 
-        List<String> lines = showCommand.execute(tasks);
-        out.flush();
+        showCommand.execute(tasks);
 
-        assertEquals(lines.size(), 2);
-        assertEquals(lines.get(0), projectName);
-        assertEquals(lines.get(1), "    [ ] 1: " + taskText);
+        verify(fakeConsole, times(1)).print(any(ProjectName.class));
+        verify(fakeConsole, times(1)).print(any(DisplayMessage.class));
 
     }
 }
