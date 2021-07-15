@@ -56,7 +56,7 @@
                     <programs>
                         <program>
                             <id>task-list</id>
-                            <mainClass>com.codurance.training.tasks.TaskList</mainClass>
+                            <mainClass>com.codurance.training.tasks.TaskListApplication</mainClass>
                         </program>
                     </programs>
                 </configuration>

@@ -6,16 +6,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TaskMapTest {
+class TaskListTest {
 
     @Test
     void addTask() {
-        TaskMap taskMap = new TaskMap();
+        TaskList taskList = new TaskList();
         ProjectName projectName = new ProjectName("Project test");
         Task task = new Task(new TaskId(1), new TaskDescription("Task test"), false);
 
-        taskMap.addTask(projectName, task);
-        List<Task> taskList = taskMap.get(new ProjectName("Project test"));
-        assertEquals(1, taskList.size());
+        taskList.addTask(projectName, task);
+        List<Task> tasks = taskList.get(new ProjectName("Project test"));
+        assertEquals(1, tasks.size());
     }
 }

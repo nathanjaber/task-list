@@ -9,7 +9,7 @@ public class ShowCommand extends Command {
         super(CommandAction.SHOW);
     }
 
-    public List<String> execute(TaskMap tasks) {
+    public List<String> execute(TaskList tasks) {
         List<String> lines = new ArrayList<>();
 
         for (Map.Entry<ProjectName, List<Task>> project : tasks.entrySet()) {
