@@ -1,6 +1,6 @@
 package com.codurance.training.tasks;
 
-public class Command {
+public abstract class Command {
     private CommandAction commandAction;
     private NodeType nodeType;
     private ProjectName projectName;
@@ -63,4 +63,7 @@ public class Command {
     public DeadLine getDeadLine() {
         return deadLine;
     }
+
+
+    public abstract void execute();
 }

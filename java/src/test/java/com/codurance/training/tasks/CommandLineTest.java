@@ -2,16 +2,23 @@ package com.codurance.training.tasks;
 
 import junit.framework.TestCase;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.mockito.Mockito;
 
 import java.time.LocalDate;
 import java.time.Month;
 
 public class CommandLineTest extends TestCase {
-    /*
-     * [CMD]  [nodetype]  [projectname]
-     *  add     project     training
-     * */
+
+    private Console console;
+    private TaskList taskList;
+
+    @BeforeEach
+    public void setUp() {
+        console = Mockito.mock(Console.class);
+        taskList = Mockito.mock(TaskList.class);
+    }
     @Test
     @DisplayName("getCommand should produce correct add project instance")
     public void testGetCommandCase1() {
@@ -21,7 +28,7 @@ public class CommandLineTest extends TestCase {
         ProjectName expectedProjectName = new ProjectName("training");
 
         // ação
-        Command command = commandLine.getCommand();
+        Command command = commandLine.makeCommand(console, taskList);
 
         // pós condições
         assertEquals(CommandAction.ADD, command.getCommandAction());
@@ -42,7 +49,7 @@ public class CommandLineTest extends TestCase {
         TaskDescription expectedTaskDescription = new TaskDescription("Four Elements of Simple Design");
 
         // ação
-        Command command = commandLine.getCommand();
+        Command command = commandLine.makeCommand(console, taskList);
 
         // pós condições
         assertEquals(CommandAction.ADD, command.getCommandAction());
@@ -70,7 +77,7 @@ public class CommandLineTest extends TestCase {
         CommandLine commandLine = new CommandLine(textLineShow);
 
         // ação
-        Command command = commandLine.getCommand();
+        Command command = commandLine.makeCommand(console, taskList);
 
         // pós condições
         assertEquals(CommandAction.SHOW, command.getCommandAction());
@@ -95,7 +102,7 @@ public class CommandLineTest extends TestCase {
         CommandLine commandLine = new CommandLine(textLine);
 
         // ação
-        Command command = commandLine.getCommand();
+        Command command = commandLine.makeCommand(console, taskList);
 
         // pós condições
         assertEquals(CommandAction.CHECK, command.getCommandAction());
@@ -110,7 +117,7 @@ public class CommandLineTest extends TestCase {
         CommandLine commandLine = new CommandLine(textLine);
 
         // ação
-        Command command = commandLine.getCommand();
+        Command command = commandLine.makeCommand(console, taskList);
 
         // pós condições
         assertEquals(CommandAction.UNCHECK, command.getCommandAction());
@@ -125,7 +132,7 @@ public class CommandLineTest extends TestCase {
         CommandLine commandLine = new CommandLine(textLine);
 
         // ação
-        Command command = commandLine.getCommand();
+        Command command = commandLine.makeCommand(console, taskList);
 
         // pós condições
         assertEquals(CommandAction.HELP, command.getCommandAction());
@@ -139,7 +146,7 @@ public class CommandLineTest extends TestCase {
         CommandLine commandLine = new CommandLine(textLine);
 
         // ação
-        Command command = commandLine.getCommand();
+        Command command = commandLine.makeCommand(console, taskList);
 
         // pós condições
         assertEquals(CommandAction.QUIT, command.getCommandAction());
@@ -154,7 +161,7 @@ public class CommandLineTest extends TestCase {
         DeadLine expectedDeadLine = new DeadLine(LocalDate.of(2021, Month.MARCH, 6));
 
         // ação
-        Command command = commandLine.getCommand();
+        Command command = commandLine.makeCommand(console, taskList);
 
         // pós condições
         assertEquals(CommandAction.DEADLINE, command.getCommandAction());

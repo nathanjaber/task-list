@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public final class TaskListApplication implements Runnable {
+public final class TaskListApplication implements Runnable, Console {
     private static final String QUIT = "quit";
 
     private final TaskList tasks = new TaskList();
@@ -39,7 +39,7 @@ public final class TaskListApplication implements Runnable {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            shouldContinue = execute(commandLine.getCommand());
+            shouldContinue = execute(commandLine.makeCommand(this,tasks));
         }
     }
 
@@ -47,7 +47,7 @@ public final class TaskListApplication implements Runnable {
         boolean shouldContinue = true;
         switch (command.getCommandAction()) {
             case SHOW:
-                show();
+                command.execute();
                 break;
             case ADD:
                 add(command);
@@ -163,6 +163,21 @@ public final class TaskListApplication implements Runnable {
 
     private void error(String command) {
         out.printf("I don't know what the command \"%s\" is.", command);
+        out.println();
+    }
+
+    @Override
+    public void print(ProjectName projectName) {
+        out.println(projectName.toString());
+    }
+
+    @Override
+    public void print(DisplayMessage displayMessage) {
+        out.println(displayMessage.toString());
+    }
+
+    @Override
+    public void print() {
         out.println();
     }
 }

@@ -1,6 +1,7 @@
 - Adicionar abstração para "DisplayMessage" -> DONE
 - Substituir switch da tasklist por polimorfismo -> IN PROGRESS
     -> Abandonar o uso do PrintWriter no contexto de ShowCommand -> DONE
-    -> Isolar testes da classe ShowCommand -> IN PROGRESSO
-    -> Introduzir a ideia do consoleLines na ShowCommand
-    -> Aumentar a variação de testes da ShowCommand
+    -> Isolar testes da classe ShowCommand -> POSTPONED
+    -> Introduzir a ideia do console na ShowCommand -> DONE
+    -> Aumentar a variação de testes da ShowCommand -> POSTPONED
+    -> Implementar show help *

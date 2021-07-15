@@ -5,4 +5,6 @@ public interface Console {
     void print(ProjectName projectName);
 
     void print(DisplayMessage displayMessage);
+
+    void print();
 }

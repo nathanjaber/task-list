@@ -37,12 +37,12 @@ class ShowCommandTest {
         String projectName = "Test fixture";
         String taskText = "Run tasks";
 
-        ShowCommand showCommand = new ShowCommand(fakeConsole);
         TaskList tasks = new TaskList();
+        ShowCommand showCommand = new ShowCommand(fakeConsole, tasks);
         Task task = new Task(new TaskId(1), new TaskDescription(taskText), false);
         tasks.addTask(new ProjectName(projectName), task);
 
-        showCommand.execute(tasks);
+        showCommand.execute();
 
         verify(fakeConsole, times(1)).print(any(ProjectName.class));
         verify(fakeConsole, times(1)).print(any(DisplayMessage.class));
